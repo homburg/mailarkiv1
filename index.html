@@ -40,8 +40,9 @@
 		});
 
 		$scope.searchFlickr = function (newValue) {
-			console.log(newValue);
 			if (!newValue) return
+
+			if ($.isArray($scope.images[newValue])) return;
 
 			(function (archiveId) {
 				flickrSearch.search({ text: archiveId }, function (data) {
