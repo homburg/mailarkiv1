@@ -76,8 +76,9 @@
 				<b data-ng-bind="item['First name'] + ' ' + item['Name']"></b>
 				<span data-ng-bind="item['Title']"></span>
 				<div>
-					<img data-ng-repeat="image in images[item['id']]"
-					data-ng-src="http://farm{{ image.farm }}.staticflickr.com/{{ image.server }}/{{ image.id }}_{{ image.secret }}_m.jpg">
+					<a data-ng-repeat="image in images[item['id']]" data-ng-href="http://www.flickr.com/photos/{{ image.owner }}/{{ image.id }}" target="_blank">
+						<img data-ng-src="http://farm{{ image.farm }}.staticflickr.com/{{ image.server }}/{{ image.id }}_{{ image.secret }}_m.jpg">
+					</a>
 				</div>
 			</diV>
 		</div>
