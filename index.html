@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.0/angular.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.0/angular-resource.min.js"></script>
+<script type="text/javascript">
+(function () {
+	var app = angular.module("mailarkiv", ["ngResource"]);
+
+	app.factory("flickrSearch", function ($resource) {
+		return $resource(
+			"http://api.flickr.com/services/rest/",
+			{
+				api_key: "4f1bcd7e6d144f9307259b66b8617440",
+				user_id: "69055161@N03",
+				format: "json",
+				nojsoncallback: 1
+			},
+			{
+				search: {
+					method: "GET",
+					params: {
+						method: "flickr.photos.search"
+					},
+					isArray: false
+				}
+			}
+		);
+	});
+
+	app.controller("mailCtrl", function ($scope, flickrSearch, $http) {
+		$scope.images = {};
+
+		$http.get("https://mailarkiv1.firebaseio.com/.json?limit=20")
+		.success(function (data) {
+			$scope.archive = data
+		});
+
+		$scope.searchFlickr = function (newValue) {
+			console.log(newValue);
+			if (!newValue) return
+
+			(function (archiveId) {
+				flickrSearch.search({ text: archiveId }, function (data) {
+					$scope.images[archiveId] = data.photos.photo
+				});
+			})(newValue);
+		};
+	});
+})();
+</script>
+<style type="text/css">
+.archive-item {
+	cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+	<div class="container" ng-app="mailarkiv" ng-controller="mailCtrl">
+
+		<h1>MAILARKIV (100)</h1>
+
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<a href="https://mailarkiv1.firebaseio.com/">https://mailarkiv1.firebaseio.com/</a>
+			</div>
+		</div>
+
+		<div class="list-group">
+			<div data-ng-repeat="item in archive" class="archive-item list-group-item" data-ng-click="searchFlickr(item.id)">
+				<b data-ng-bind="item['First name'] + ' ' + item['Name']"></b>
+				<span data-ng-bind="item['Title']"></span>
+				<div>
+					<img data-ng-repeat="image in images[item['id']]"
+					data-ng-src="http://farm{{ image.farm }}.staticflickr.com/{{ image.server }}/{{ image.id }}_{{ image.secret }}_m.jpg">
+				</div>
+			</diV>
+		</div>
+
+	</div>
+
+</body>
+</html>
